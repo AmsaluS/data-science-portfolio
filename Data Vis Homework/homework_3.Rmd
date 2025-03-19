@@ -1,0 +1,134 @@
+---
+title: "homework_3"
+output: html_document
+---
+
+## Libraries
+```{r setup, include=FALSE}
+library(ggplot2)  
+library(dplyr)     
+library(tidyr)
+library(nycflights13)
+library(lubridate)
+library(gapminder)
+
+# Filter the dataset for a single country (China)
+china_data <- gapminder %>%
+  filter(country == "China")
+
+# Filter for the most recent year
+latest_year_data <- gapminder %>%
+  filter(year == max(year))
+
+# Create the wind_data object
+wind_data <- weather %>%
+  select(wind_speed) %>%        
+  filter(!is.na(wind_speed))    
+
+# Create delta_flights object
+delta_flights <- flights %>%
+  filter(carrier == "DL")
+
+# Create hourly_temperatures object
+hourly_temperatures <- weather %>%
+  select(time_hour, temp) %>%  
+  filter(!is.na(temp))          
+
+# Create filtered_wind_data object
+filtered_wind_data <- weather %>%
+  filter(!is.na(wind_speed)) %>% 
+  mutate(month = lubridate::month(time_hour)) %>% 
+  select(month, wind_speed) 
+
+```{r plot1}
+# Plot 1: Default bandwidth chosen by R
+p1 <- ggplot(wind_data, aes(x = wind_speed)) +
+  geom_density(fill = "blue", alpha = 0.5) +
+  ggtitle("Density Plot: Default Bandwidth") +
+  xlim(0, 100)
+p1
+```
+
+```{r plot2}
+# Plot 2: Smaller bandwidth
+p2 <- ggplot(wind_data, aes(x = wind_speed)) +
+  geom_density(fill = "green", alpha = 0.5, bw = 2) +
+  ggtitle("Density Plot: Bandwidth = 2") +
+  xlim(0, 100) 
+p2
+```
+
+```{r plot3}
+# Plot 3: Larger bandwidth
+p3 <- ggplot(wind_data, aes(x = wind_speed)) +
+  geom_density(fill = "orange", alpha = 0.5, bw = 10) +
+  ggtitle("Density Plot: Bandwidth = 10") +
+  xlim(0, 100)
+p3
+```
+  
+```{r plot4}
+# Plot 4: Violin Plot
+p4 <- ggplot(filtered_wind_data, aes(x = factor(month), y = wind_speed))+ geom_violin(fill = "red", color = "black") + xlab("Month") + ylab("Wind Speed") + ggtitle("Violin Plot of Wind Speed Distribution Per Month") + ylim(0,50) 
+p4
+```
+
+```{r plot5}
+# Plot 5: Population vs GDP for China
+p5 <- ggplot(china_data, aes(x = pop, y = gdpPercap)) +
+  geom_line() +
+  ggtitle("Population vs. GDP for China") +
+  xlab("Population") +
+  ylab("GDP per Capita")
+p5
+```
+
+```{r plot6}
+# Plot 6: GDP per Capita Over Time for China
+p6 <- ggplot(china_data, aes(x = year, y = gdpPercap, size = pop)) +
+  geom_line() +
+  geom_point() +
+  ggtitle("GDP per Capita Over Time for China (with Population Size)") +
+  xlab("Year") +
+  ylab("GDP per Capita")
+p6
+```
+
+```{r plot7}
+# Plot 7: Log scale for population vs GDP by continent
+p7 <- ggplot(latest_year_data, aes(x = pop, y = gdpPercap, color = continent)) +
+  geom_point() +
+  scale_x_log10() +  
+  labs(title = "Population vs. GDP by Continent (Most Recent Year)",
+       x = "Population (Log Scale)",
+       y = "GDP per Capita",
+       color = "Continent")
+p7
+```
+
+```{r plot8}
+# Plot 8: Log-transformed departure delays by carrier
+p8 <- ggplot(flights, aes(x = carrier, y = dep_delay)) +
+  geom_boxplot() +
+  scale_y_log10() +  # Apply log transformation to the y-axis
+  labs(title = "Log-Transformed Departure Delays by Carrier",
+       x = "Carrier", y = "Log(Departure Delay)")
+p8
+```
+
+## ANSWERS TO ACTIVITIES ARE BELOW THE LINE
+
+## Activity 1:
+The default bandwidth graph is likely the most useful because it provides a balanced view of the wind speed distribution, showing the general pattern while smoothing out the rest of the points on the graph. A smaller bandwidth adds more detail and highlights subtle variations, but it can overfit the data and create spurious peaks that are not meaningful. A larger bandwidth smooths the curve more aggressively, revealing overall trends but potentially oversimplifying the data by hiding important variations. The default bandwidth has the best balance, making it easier to interpret key trends without losing important details and missing important data points that are essential to the trend.
+
+## Activity 2:
+The violin plot shows the shape and density of the wind speed distribution, which is not visible in the boxplots I made previously. It reveals where the data is concentrated, whether the distribution is skewed, and if there are multiple peaks. Unlike the boxplots, which only show the median and quartiles, violin plots give a clearer view of the data’s overall distribution.
+
+## Activity 3:
+Graph 2 or the second GDP/Capita graph, is more useful for understanding how both GDP and population have changed over time because it shows the trend of GDP over the years while also representing population size with dot size. This allows us to see how population and GDP evolve together year by year. In contrast, Graph 1 only shows the relationship between population and GDP at a single point in time, without giving insight into how they change over the years.
+
+## Activity 4:
+The scatterplot shows a general positive relationship between population size and GDP, with continents that have larger populations (like Asia) often having higher GDPs. However, Oceania, a smaller continent than the others, has a very high GDP per capita. The log scale for population helps visualize countries with large populations, and using colors to represent continents highlights differences in GDP across regions, with Europe and North America having relatively high GDPs compared to their population sizes.
+
+## Activity 5: Warning message - "Transformation introduced infinite values"
+The warning message occurs because the log transformation cannot handle zero or negative values, and it will return infinite values for those points. Log transformations are useful for skewed data, but they only work with positive values. If the data contains zeros or negative numbers, we might need to filter those values before applying the transformation. If the data is not skewed, a log transformation may not be necessary.

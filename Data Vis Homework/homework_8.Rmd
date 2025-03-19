@@ -1,0 +1,49 @@
+---
+title: "homework 8"
+author: "Amsalu Schmidt"
+date: "2025-03-04"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(socviz)  
+library(ggplot2)
+library(dplyr)
+library(maps)
+
+```
+```{r}
+# Load the election data
+data("election", package = "socviz")
+
+# Select only necessary columns (state and Libertarian vote percentage)
+johnson_results <- election %>%
+  select(state, pct_johnson) %>%
+  mutate(state = tolower(state))  # Convert state names to lowercase for mapping
+
+# Load U.S. states map data
+us_states <- map_data("state")
+
+# Merge map data with Johnson's election results
+map_data_merged <- us_states %>%
+  left_join(johnson_results, by = c("region" = "state"))
+
+# Create the map
+map<-ggplot(map_data_merged, aes(long, lat, group = group, fill = pct_johnson)) +
+  geom_polygon(color = "white", size = 0.2) +
+  scale_fill_gradient(low = "lightyellow", high = "goldenrod", na.value = "gray90",
+                      name = "Johnson %") +
+  theme_minimal() +
+  labs(title = "2016 Libertarian Vote Share by State",
+       subtitle = "Percentage of Vote Won by Gary Johnson",
+       caption = "Source: socviz package (election dataset)") +
+  theme(legend.position = "right")
+
+print(map)
+```

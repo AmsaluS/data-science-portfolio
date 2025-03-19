@@ -1,0 +1,109 @@
+---
+title: "Homework_2"
+output:
+  html_document: default
+  pdf_document: default
+date: "2025-01-14"
+---
+
+## Libraries
+```{r setup, include=FALSE}
+library(ggplot2)  
+library(dplyr)     
+library(tidyr)
+library(nycflights13)
+library(lubridate)
+
+# Create delta_flights object
+delta_flights <- flights %>%
+  filter(carrier == "DL")
+
+# Create hourly_temperatures from the weather dataset
+hourly_temperatures <- weather %>%
+  select(time_hour, temp) %>%  # Select relevant columns
+  filter(!is.na(temp))          # Remove rows with missing temperature values
+
+# Create filtered_wind_data from the weather dataset
+filtered_wind_data <- weather %>%
+  filter(!is.na(wind_speed)) %>% # Remove rows with missing wind speed values
+  mutate(month = lubridate::month(time_hour)) %>% # Add a month column for grouping
+  select(month, wind_speed) # Keep only the relevant columns
+
+# Create wind_data 
+wind_data <- weather %>%
+  select(wind_speed) %>%        # Select the wind_speed column
+  filter(!is.na(wind_speed))    # Remove rows with missing wind speed values
+
+# Set global chunk options for knitting
+knitr::opts_chunk$set(echo = TRUE, fig.show = 'hold', fig.width = 7, fig.height = 5)
+```
+
+## Plots
+
+```{r plot1}
+# Plot 1: Scatter Plot of Distance vs. Air Time
+p1 <- ggplot(data = delta_flights, aes(x = distance, y = air_time)) +
+  geom_point()
+print(p1)
+```
+
+```{r plot2}
+# Plot 2: Line Graph of Temperature Over Time
+p2 <- ggplot(data = hourly_temperatures, aes(x = time_hour, y = temp)) +
+  geom_line()
+print(p2)
+```
+
+```{r plot3}
+# Plot 3: Boxplot of Wind Speed by Month
+p3 <- ggplot(filtered_wind_data, aes(x = factor(month), y = wind_speed)) +
+  geom_boxplot()
+print(p3)
+```
+
+```{r plot4}
+# Plot 4: Histogram of Wind Speeds (Default Binwidth)
+p4 <- ggplot(wind_data, aes(x = wind_speed)) +
+  geom_histogram(fill = "green", color = "black") +
+  xlim(0, 100)
+print(p4)
+```
+
+```{r plot5}
+# Plot 5: Histogram of Wind Speeds (Binwidth = 2)
+p5 <- ggplot(wind_data, aes(x = wind_speed)) +
+  geom_histogram(binwidth = 2, fill = "yellow", color = "black") +
+  xlim(0, 100)
+print(p5)
+```
+
+```{r plot6}
+# Plot 6: Histogram of Wind Speeds (Binwidth = 10)
+p6 <- ggplot(wind_data, aes(x = wind_speed)) +
+  geom_histogram(binwidth = 10, fill = "orange", color = "black") +
+  xlim(0, 100)
+print(p6)
+```
+
+```{r plot7}
+# Plot 7: Bar Plot of Carrier Count by Origin
+p7 <- ggplot(data = flights, aes(x = carrier, fill = origin)) +
+  geom_bar()
+print(p7)
+```
+
+## Answers to activities are below this line
+
+### Activity 1:
+The scatterplot shows that longer flights take more time, which makes sense because distance and air time are closely related. The vertical bands happen because many flights cover the same fixed distances between specific city pairs, like New York to Atlanta or New York to Los Angeles. These repeated distances create groups of points on the graph, as flights between the same cities will always have similar distances. However, air time for the same distance can vary slightly due to factors like weather, flight paths, or air traffic delays. This is why there is some spread within each vertical band.
+
+### Activity 2:
+Temperatures at JFK and Newark show similar patterns over time, with both airports experiencing the same general trends in hourly temperature changes. Newark is usually slightly warmer than JFK, likely because it is more inland, while JFK's coastal location moderates its temperatures. For the most part, both airports follow the same fluctuations during the January 1–15 period.
+
+### Activity 4:
+The three histograms provide different levels of detail about the windspeed distribution. The basic histogram, which cuts out the extremely large value using `xlim(0, 100)`, offers a clear and balanced view of the data by removing the influence of the large value (which is an outlier in the distribution). This allows the focus to remain on the typical range of wind speeds, making it easier to understand the general distribution without being skewed by an extreme data point. The narrower bars, `binwidth = 2`, display more granular detail, revealing fluctuations in the data, but this can sometimes lead to a cluttered appearance where the underlying distribution may be harder to interpret due to excessive data bars and points. On the other hand, the wider bars, `binwidth = 10`, provide a smoother and more generalized view, reducing strain on the excessive data bar, but they may oversimplify the data by missing key patterns and subtle variations that are necessary for the observation of the results. The basic histogram with the limit applied, in this case, is the most useful histogram as it summarizes the distribution efficiently, presents a clear view of the data, and shows enough of the distribution shape to show vital trends.
+
+### Activity 5:
+The two most common origins for flights are EWR and JFK.
+
+---

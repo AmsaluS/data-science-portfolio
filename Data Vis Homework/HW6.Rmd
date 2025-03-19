@@ -1,0 +1,170 @@
+---
+title: "HW6"
+author: "Amsalu Schmidt"
+date: "2025-02-16"
+output: html_document
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(broom)
+library(gapminder)
+library(readr)
+library(splines)
+library(tidyr)
+library(purrr)
+```
+
+```{r}
+kaggle_data <- read_csv("kaggle-data.csv")
+
+View(kaggle_data)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+
+## Including Plots
+
+## Scatter Plot
+
+ gapminder_filtered <- gapminder %>%
+     filter(country == "Brazil") ## filter for country
+
+scatter <- ggplot(gapminder_filtered, aes(x = year, y = pop)) +
+  geom_point() +  # Scatterplot points
+  geom_smooth(method = "lm", se = FALSE, color = "#1B9E77", linetype = "solid", aes(linetype = "Linear Model")) +  # Linear
+  geom_smooth(method = "loess", se = FALSE, color = "#D95F02", linetype = "dashed", aes(linetype = "LOESS Model")) +  # LOESS
+  geom_smooth(method = "lm", formula = y ~ ns(x, df = 3), se = FALSE, color = "#7570B3", linetype = "dotted", aes(linetype = "Cubic Spline")) +  # Cubic Spline
+  labs(title = paste("Population Trends in", "Brazil"),
+       x = "Year",
+       y = "Population",
+       linetype = "Model Type") +
+  theme_minimal() +
+  scale_linetype_manual(values = c("solid", "dashed", "dotted"))
+ 
+  print (scatter) 
+```
+
+
+```{r}
+# Filter for Americas
+gapminder_americas <- gapminder %>%
+  filter(continent == "Americas")
+
+# Fit a linear model predicting population by year and country
+model <- lm(pop ~ year * country, data = gapminder_americas)
+
+# Create a new dataset for predictions
+years <- seq(1950, 2025, by = 5)
+countries_selected <- c("Canada", "Brazil")  # Pick two countries
+
+# Generate a new dataset for prediction
+prediction_data <- expand.grid(year = years, country = countries_selected)
+
+# Get predictions with confidence intervals
+predicted_values <- predict(model, newdata = prediction_data, interval = "predict", level = 0.95)
+
+# Convert predictions to a data frame and rename columns
+prediction_data <- cbind(prediction_data, as.data.frame(predicted_values))
+colnames(prediction_data) <- c("year", "country", "pop", "pop_lwr", "pop_upr")  # Rename correctly
+
+# Plot predictions with confidence intervals
+p1<- ggplot(prediction_data, aes(x = year, y = pop, color = country)) +
+  geom_line(size = 1) +
+  geom_ribbon(aes(ymin = pop_lwr, ymax = pop_upr, fill = country), alpha = 0.2, color = NA) +
+  labs(title = "Predicted Population Growth (1950-2025)",
+       x = "Year",
+       y = "Population",
+       color = "Country",
+       fill = "Country") +
+  theme_minimal()
+print(p1)
+# Check residuals
+residuals_data <- augment(model)
+
+# Plot residuals vs. fitted values
+p2<-ggplot(residuals_data, aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  labs(title = "Residuals vs. Fitted Values",
+       x = "Fitted Values",
+       y = "Residuals") +
+  theme_minimal()
+  
+  print(p2)
+```
+  
+  
+  
+  ```{r}
+  # Nest data by country
+nested_data <- gapminder_americas %>%
+  group_by(country) %>%
+  nest()
+
+# Define function to fit model
+fit_model <- function(df) {
+  lm(pop ~ year, data = df)
+}
+
+# Apply model to each country
+nested_data <- nested_data %>%
+  mutate(model = map(data, fit_model),
+         results = map(model, tidy))
+
+# Extract slope estimates
+slope_data <- nested_data %>%
+  unnest(results) %>%
+  filter(term == "year")
+
+# Plot slopes with error bars
+errorGraph<-ggplot(slope_data, aes(x = reorder(country, estimate), y = estimate)) +
+  geom_pointrange(aes(ymin = estimate - 2 * std.error, ymax = estimate + 2 * std.error), color = "blue") +
+  coord_flip() +
+  labs(title = "Population Growth Rates in the Americas",
+       x = "Country",
+       y = "Estimated Growth Rate (per Year)") +
+  theme_minimal()
+  
+  print(errorGraph)
+  ```
+
+
+```{r}
+# Filter data for the year 2020
+energy_2020 <- kaggle_data %>% filter(Year == 2020)
+
+# Select top 10 countries based on energy consumption per capita
+top_countries <- energy_2020 %>% arrange(desc(gdp_per_capita)) %>% slice_head(n = 10)
+
+# Dot plot
+dot<-ggplot(top_countries, aes(x = gdp_per_capita, y = reorder(Entity, gdp_per_capita), color = Entity)) +
+  geom_point(size = 4, show.legend = FALSE) +
+  labs(title = "Top 10 Countries by GDP Per Capita (2020)", 
+       x = "GDP Per Capita", 
+       y = "Country") +
+  theme_minimal()
+  
+  print(dot)
+
+```
+
+## Answers to activities are below this line
+
+## Activity 2:
+The residual plot tells us that if the residuals are randomly sccater, a linear model is reasonable and if there is a clear pattern, a more complex model may be needed due to non-linearity.
+
+## Activity 3:
+The graph shows population growth rates across countries in the Americas. Larger postive slopes show faster-growing populations while smaller/negatives slopes show slower/declining populations.For example, the US and Mexico show the highest (positive slopes) population growth in the Americas while Trinidad and Tobago, Uruguay and Jamaica (negative slope) show little to no growth over the years.
+
+
