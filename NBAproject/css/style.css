@@ -1,0 +1,285 @@
+/* General Page Styles */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to bottom right, #cce5ff, #e6f2ff);
+  color: #1c1c2e;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Container */
+.container {
+  text-align: center;
+  padding: 40px 20px 20px;
+  flex: 1;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Main NBA Logo */
+.nba-logo {
+  max-width: 300px;
+  width: 100%;
+  height: auto;
+  margin-top: -100px;
+}
+
+/* Float animation for logo (only on index) */
+.floating-logo {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0); }
+}
+
+/* Footer NBA Logo */
+.nba-logo-footer {
+  max-width: 100px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+/* Side Logos */
+.side-logo {
+  max-width: 80px;
+  width: 100%;
+  height: auto;
+  opacity: 0.9;
+  z-index: 1;
+  margin: 20px auto; /* Center the logos */
+}
+
+.left-logo {
+  float: left; /* Float left for positioning */
+  margin-left: 0%; /* Adjust as needed */
+}
+
+.right-logo {
+  float: right; /* Float right for positioning */
+  margin-right: 11%; /* Adjust as needed */
+}
+
+/* Basketball Hoops on Index */
+.hoop-img {
+  max-width: 500px;
+  width: 100%;
+  height: auto;
+  opacity: 0.85;
+  z-index: 0;
+  margin: 20px auto; /* Center the hoops */
+}
+
+.left-hoop {
+  float: left; /* Float left for positioning */
+  margin-left: -2%; /* Adjust as needed */
+  transform: scaleX(-1);
+}
+
+.right-hoop {
+  float: right; /* Float right for positioning */
+  margin-right: -2%; /* Adjust as needed */
+  transform: scaleX(1);
+}
+
+/* Headings */
+h1 {
+  font-size: 48px;
+  color: hsl(204, 86%, 40%);
+  text-shadow: 2px 2px 6px black;
+  margin-bottom: 15px;
+  width: 90%; /* Match table width */
+  max-width: 1000px; /* Match table max-width */
+  margin: 30px auto 15px auto; /* Match table margins, adjust bottom */
+}
+
+h2 {
+  font-size: 28px;
+  color: hsl(204, 86%, 40%);
+  margin-bottom: 20px;
+  text-shadow: 1px 1px 4px black;
+}
+
+.call-to-action {
+  font-size: 18px;
+  color: hsl(204, 86%, 40%);
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Navigation Links */
+.nav-links {
+  list-style-type: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 400px;
+}
+
+.nav-links li {
+  margin: 12px 0;
+}
+
+.nav-links a {
+  text-decoration: none;
+  font-size: 20px;
+  color: red;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: #000000;
+}
+
+/* Footer */
+.footer {
+  background-color: #ffffff;
+  color: #333;
+  padding: 20px;
+  text-align: center;
+  font-size: 14px;
+  margin-top: auto;
+  border-top: 1px solid #ccc;
+}
+
+/* Table Styles */
+table {
+  margin: 30px 50px 30px auto;
+  border-collapse: collapse;
+  width: 200%;
+  max-width: 1300px;
+  background-color: #ffffffcc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+table thead {
+  background-color: #0056b3;
+  color: white;
+}
+
+table th, table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+table tbody tr:nth-child(even) {
+  background-color: #f2f9ff;
+}
+
+table tbody tr:hover {
+  background-color: #d9ecff;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 768px) {
+  h1 {
+      font-size: 36px;
+  }
+
+  h2 {
+      font-size: 22px;
+  }
+
+  .nba-logo {
+      max-width: 200px;
+      margin-top: -50px;
+  }
+
+  .hoop-img {
+      max-width: 300px;
+  }
+
+  .side-logo {
+      max-width: 60px; /* Smaller size for tablets */
+  }
+
+  .left-logo {
+      margin-left: 2%; /* Adjusted for smaller screens */
+  }
+
+  .right-logo {
+      margin-right: 2%; /* Adjusted for smaller screens */
+  }
+
+  .left-hoop {
+      margin-left: -15%; /* Adjusted for smaller screens */
+  }
+
+  .right-hoop {
+      margin-right: -15%; /* Adjusted for smaller screens */
+  }
+
+  .nav-links a {
+      font-size: 18px;
+  }
+
+  table {
+      font-size: 14px;
+  }
+
+  table th, table td {
+      padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+      font-size: 28px;
+  }
+
+  h2 {
+      font-size: 18px;
+  }
+
+  .nba-logo {
+      max-width: 150px;
+      margin-top: -30px;
+  }
+
+  .hoop-img {
+      max-width: 200px;
+  }
+
+  .side-logo {
+      max-width: 40px; /* Smaller size for mobile */
+  }
+
+  .left-logo {
+      margin-left: 1%; /* Adjusted for mobile screens */
+  }
+
+  .right-logo {
+      margin-right: 1%; /* Adjusted for mobile screens */
+  }
+
+  .left-hoop {
+      margin-left: -20%; /* Adjusted for mobile screens */
+  }
+
+  .right-hoop {
+      margin-right: -20%; /* Adjusted for mobile screens */
+  }
+
+  .nav-links a {
+      font-size: 16px;
+  }
+
+  .footer {
+      font-size: 12px;
+  }
+}
+.nba-themed-line {
+  border: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #FFA500, #000000); /* Orange to black gradient */
+  margin: 20px 0; /* Adjust spacing as needed */
+}
